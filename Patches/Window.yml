@@ -27,7 +27,7 @@
 ############################################################################
 
 ButtonVis:
-    title : BASIC BUTTON VISIBILITY
+    title : SHOW BUTTON
     mutex : false
     color : orangered
     
@@ -47,8 +47,8 @@ ButtonVis:
         - ShowNewButtons:
             title : Show Buttons (New UI)
             recommend : no
-            author : Neo-Mind,Skylove,Cremané
-            desc : Shows some of the various hidden buttons in the Basic Info Window under the HP/SP Bars.
+            author : Neo-Mind,Skylove,Cremané,Victor Hugo
+            desc : "Shows hidden buttons in the Basic Info Window under the HP/SP bars. Available options: Booking and Battleground. Battleground also restores the Entry Queue click action."
 
 CharCreation:
     title : CHARACTER CREATION

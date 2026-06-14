@@ -22,7 +22,7 @@
 #                                                                          #
 #   Author(s)     : Neo-Mind, Victor Hugo                                  #
 #   Created Date  : 2020-08-26                                             #
-#   Last Modified : 2026-06-10                                             #
+#   Last Modified : 2026-06-14                                             #
 #                                                                          #
 ############################################################################
 
@@ -425,10 +425,10 @@ CustomPath:
             desc : Change the filename used for EULA from <b>..\licence.txt</b> to user specified name (Path is relative to Data folder).
 
         - CustomClientInfo:
-            title : Customize ClientInfo file
+            title : Rename clientinfo.xml
             recommend : no
-            author : Secret
-            desc : Change the clientinfo XML file loaded from *clientinfo.xml to user specified name.
+            author : Secret, Victor Hugo
+            desc : "Renames the clientinfo.xml file loaded by the client."
 
         - AllowHomunSkills:
             title : Unlock all valid skills for homunculus and mercenary AI

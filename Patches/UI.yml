@@ -266,12 +266,6 @@ CustomUI:
             author : Sapito Sucio
             desc : Restores WoE flag's animation, disabled by Gravity long ago.
 
-        - RestoreBattlegroundUI:
-            title : Restore Battleground UI
-            recommend : no
-            author : Skylove, Sprite Smith
-            desc : Restores the hidden Battleground navigation button and re-enables Entry Queue UI.
-
         - HideItemba:
             title : Hide Item bar
             recommend : no
