@@ -1,8 +1,11 @@
 // *********************************************************** \\
 // Author(s)     : Victor Hugo
-// Last Modified : 2026-06-10
+// Last Modified : 2026-06-14
 function RestoreBattlegroundUI()
 {
+	if (CACHE.has('RestoreBattlegroundUI_Applied'))
+		return true;
+
 	const StrNavigation = Exe.FindText("navigation");
 	if (StrNavigation < 0)
 	{
@@ -118,32 +121,6 @@ function RestoreBattlegroundUI()
 
 	const AddrDetourCall = Addr + SendMsgCallOff;
 	const AddrDetourAddr = Exe.GetTgtAddr(AddrDetourCall + 1);
-	let AddrGetModeContext = 0;
-	let AddrCheckButtonDispatch = 0;
-
-	if (GuardClickMsg)
-	{
-		const CodeGetModeContext = CALL(ALLWC);
-		const CodePrepareCheck =
-			MOV(EBX, [EBP, 0x10])
-		+	MOV(ECX, EAX)
-		+	PUSH(EBX);
-		const CodeCheckButtonDispatch =
-			CALL(ALLWC)
-		+	TEST(AL, AL);
-		const CodeFilter = CodeGetModeContext + CodePrepareCheck + CodeCheckButtonDispatch;
-
-		Addr = Exe.FindHex(CodeFilter, AddrDetourCall, AddrDetourCall + 0x60);
-		if (Addr < 0)
-		{
-			throw Error("Could not find the pre-switch button filter pattern");
-		}
-
-		AddrGetModeContext = Exe.GetTgtAddr(Addr + 1);
-		AddrCheckButtonDispatch = Exe.GetTgtAddr(
-			Addr + CodeGetModeContext.byteCount() + CodePrepareCheck.byteCount() + 1
-		);
-	}
 
 	Code = "8B 41 34 85 C0 74 ?? 56 83 C0 04 B9 0A 09 00 00 50 8D 45 ?? 66 89 4D ??";
 
@@ -185,26 +162,30 @@ function RestoreBattlegroundUI()
 			CMP([EBP, 0x0C], 6)
 		+	JNE(Filler(21, 1));
 
-		const GuardSeg1 =
+		let GuardSeg1 =
 			CMP([EBP, 0x10], BattlegroundButtonID)
 		+	JNE(Filler(22, 1));
 
-		const GuardSeg2 =
-			CALL(Filler(14))
-		+	MOV(ECX, EAX)
-		+	PUSH([EBP, 0x10])
-		+	CALL(Filler(15))
-		+	TEST(AL, AL)
-		+	JNE(Filler(23, 1));
+		if (BattlegroundButtonID === 0x178)
+		{
+			GuardSeg1 =
+				CMP([EBP, 0x10], BattlegroundButtonID)
+			+	JE(9)
+			+	CMP([EBP, 0x10], 0xC9)
+			+	JNE(Filler(22, 1));
+		}
+
+		// The 2026 client reports this button as handled once ShowNewButtons
+		// makes it visible, but the original handler still does not open
+		// EntryQueue. Intercept the Battleground click directly instead.
+		const GuardSeg2 = "";
 
 		const GuardSeg3 =
 			MOV(ECX, [AddrEntryQueue])
 		+	TEST(ECX, ECX)
 		+	JE(Filler(24, 1));
 
-		const GuardSeg4 =
-			CMP(BYTE_PTR, [ECX, 0x3C], 1)
-		+	JNE(Filler(25, 1));
+		const GuardSeg4 = "";
 
 		Parts =
 		[
@@ -239,10 +220,10 @@ function RestoreBattlegroundUI()
 			CMP([EBP, 0x10], BattlegroundButtonID)
 		+	JNE(Filler(1, 1)),
 
-			PUSH(ECX)
-		+	MOV(ECX, [AddrEntryQueue])
-		+	CMP(BYTE_PTR, [ECX, 0x3C], 1)
-		+	JNE(Filler(2, 1)),
+		PUSH(ECX)
+	+	MOV(ECX, [AddrEntryQueue])
+	+	TEST(ECX, ECX)
+	+	JE(Filler(2, 1)),
 
 			CALL(Filler(3)),
 
@@ -275,17 +256,14 @@ function RestoreBattlegroundUI()
 			6  : AddrSendEntryPacket,
 			7  : AddrOpenMenuWindow,
 			8  : AddrDetourAddr,
-			9  : AddrGetModeContext,
-			10 : AddrCheckButtonDispatch,
 			11 : AddrSendEntryPacket,
 			12 : AddrOpenMenuWindow,
 			13 : AddrDetourAddr,
-			14 : AddrGetModeContext,
-			15 : AddrCheckButtonDispatch,
 		}
 	};
 
 	AutoHook(AddrDetourCall, TemplateDetourSendMsg, HookArgs);
+	CACHE.put('RestoreBattlegroundUI_Applied', true);
 
 	return true;
 }

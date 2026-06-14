@@ -435,6 +435,10 @@ NewButtonVis.stage = function(patchName)
 			Exe.SetUint32(Refs.ReputeInitIdPhy, 0x0237);
 	}
 
+	const BattlegroundName = this.Data.get('battle');
+	if (ShowSelection && BattlegroundName && ShowSelection.includes(BattlegroundName))
+		RestoreBattlegroundUI();
+
 	$$(_, 2.2, `Iterate through the current selection and change the value in table or add corresponding JE to code`)
 	const index = this.Members.indexOf(patchName);
 	let selection = CACHE.get('Selection:' + patchName);
