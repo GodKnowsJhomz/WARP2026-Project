@@ -32,6 +32,12 @@ CustomUI:
     color : orangered
     
     patches:
+        - LoadGRFOnSlashCmd:
+            title : Load GRF on slash command
+            recommend : no
+            author : Demonbytes (NoxaraRO), Victor Hugo
+            desc : Adds a configurable slash command that toggles loading a custom GRF at runtime and persists the toggle state in the registry.
+
         - AllowShortcutsInWine:
             title : Allow shortcuts in WINE [Experimental]
             recommend : no
@@ -95,7 +101,7 @@ CustomUI:
         - EnableFlagEmotes:
             title : Enable flag emoticons
             recommend : no
-            author : Neo-Mind
+            author : Neo-Mind, Victor Hugo
             desc : Enable Selected Flag Emoticons for all Langtypes. You need to specify a txt file as input with the flag constants assigned to 1-9.
 
         - NoSerialDisplay:
