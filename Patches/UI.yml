@@ -22,7 +22,7 @@
 #                                                                          #
 #   Author(s)     : Neo-Mind, Victor Hugo, Skylove                         #
 #   Created Date  : 2020-08-26                                             #
-#   Last Modified : 2026-07-22                                             #
+#   Last Modified : 2026-08-23                                             #
 #                                                                          #
 ############################################################################
 
@@ -32,6 +32,12 @@ CustomUI:
     color : orangered
     
     patches:
+        - RestoreSkillInfoCheckbox:
+            title : Restore the "View Skill Info." checkbox in the Skill Tree
+            recommend : no
+            author : Stingor
+            desc : Restores the checkbox and shows skill details while hovering when it is enabled.
+
         - KeepJobExpBarVisible:
             title : Keep Job EXP Bar Visible at Max Job Level
             recommend : no

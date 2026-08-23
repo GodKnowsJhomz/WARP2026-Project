@@ -1,0 +1,115 @@
+/**************************************************************************\
+*                                                                          *
+*   Copyright (C) 2026                                                     *
+*                                                                          *
+*   This file is a part of WARP project (specific to RO clients)           *
+*                                                                          *
+*   WARP is free software: you can redistribute it and/or modify           *
+*   it under the terms of the GNU General Public License as published by   *
+*   the Free Software Foundation, either version 3 of the License, or      *
+*   (at your option) any later version.                                    *
+*                                                                          *
+*   This program is distributed in the hope that it will be useful,        *
+*   but WITHOUT ANY WARRANTY; without even the implied warranty of         *
+*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the           *
+*   GNU General Public License for more details.                           *
+*                                                                          *
+|**************************************************************************|
+*                                                                          *
+*   Author(s)     : Stingor empowered by Claude                            *
+*   Created Date  : 2026-08-13                                             *
+*   Last Modified : 2026-08-23                                             *
+*                                                                          *
+\**************************************************************************/
+
+const SkillAttackMotion = {
+	BuildDate: 20260106,
+	Site: "81 FF E6 07 00 00 0F 84 6D 02 00 00 8B 45 D8",
+	HookSize: 12,
+	ChainCrush: 0x174,
+	Skills: [
+		{ id: 0x88,  name: "Sonic Blow",   key: "$RestoreSonicBlowMotion" },
+		{ id: 0x18A, name: "Arrow Vulcan", key: "$RestoreArrowVulcanMotion" }
+	]
+};
+
+SkillAttackMotion.le = function(value, size)
+{
+	const out = [];
+	for (let i = 0; i < size; ++i)
+		out.push(((value >>> (8 * i)) & 0xFF).toHex(1));
+	return out.join(" ");
+};
+
+SkillAttackMotion.findSite = function()
+{
+	const addrs = Exe.FindHexN(SkillAttackMotion.Site);
+	if (addrs.length !== 1)
+		throw Error(`RestoreSkillAttackAnimation: found ${addrs.length} hook sites`);
+	return addrs[0];
+};
+
+SkillAttackMotion.build = function(ids, caveVir, backVir)
+{
+	const le = SkillAttackMotion.le;
+	const rewriteOff = 7 * ids.length + (ids.length > 1 ? 2 : 0);
+	const backOff = rewriteOff + 5;
+	const total = backOff + 5;
+	const code = [];
+
+	ids.forEach((id, index) => {
+		const next = 7 * (index + 1);
+		code.push("66 81 FF " + le(id, 2));
+		code.push((ids.length === 1 ? "75 " + le(backOff - next, 1)
+			: "74 " + le(rewriteOff - next, 1)));
+	});
+	if (ids.length > 1)
+		code.push("EB " + le(backOff - rewriteOff, 1));
+	code.push("BF " + le(SkillAttackMotion.ChainCrush, 4));
+	code.push("E9 " + le(backVir - (caveVir + total), 4));
+	return { hex: code.join(" "), size: total };
+};
+
+/// \brief Restores the selected skill attack motions.
+RestoreSkillAttackAnimation = function(_)
+{
+	if (Exe.BuildDate !== SkillAttackMotion.BuildDate)
+		throw Error("RestoreSkillAttackAnimation supports only the 2026-01-07 client");
+
+	const ids = SkillAttackMotion.Skills
+		.filter(skill => Exe.GetUserInput(
+			skill.key, D_Bool,
+			"Restore " + skill.name + " Animation",
+			"Restore <b>" + skill.name + "</b> attack animation?",
+			true
+		))
+		.map(skill => skill.id);
+	if (ids.length === 0)
+		Cancel("No skill selected");
+
+	$$(_, 1, `Locate the skill animation route`);
+	const sitePhy = SkillAttackMotion.findSite();
+	const siteVir = Exe.Phy2Vir(sitePhy, CODE);
+	const backVir = siteVir + SkillAttackMotion.HookSize;
+	const size = SkillAttackMotion.build(ids, 0, 0).size;
+	const [cavePhy, caveVir] = Exe.Allocate(size, 0x10);
+	const cave = SkillAttackMotion.build(ids, caveVir, backVir);
+	Exe.SetHex(cavePhy, cave.hex);
+
+	const jump = "E9 " + SkillAttackMotion.le(caveVir - (siteVir + 5), 4);
+	const pad = new Array(SkillAttackMotion.HookSize - 5).fill("90").join(" ");
+	Exe.SetHex(sitePhy, jump + " " + pad);
+	return true;
+};
+
+RestoreSkillAttackAnimation.validate = function()
+{
+	if (Exe.BuildDate !== SkillAttackMotion.BuildDate)
+		return false;
+	try {
+		SkillAttackMotion.findSite();
+		return true;
+	} catch (error) {
+		return false;
+	}
+};

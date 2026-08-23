@@ -1,0 +1,68 @@
+/**************************************************************************\
+*                                                                          *
+*   Copyright (C) 2026 Stingor                                             *
+*                                                                          *
+*   This file is a part of WARP project (specific to RO clients)           *
+*                                                                          *
+*   WARP is free software: you can redistribute it and/or modify           *
+*   it under the terms of the GNU General Public License as published by   *
+*   the Free Software Foundation, either version 3 of the License, or      *
+*   (at your option) any later version.                                    *
+*                                                                          *
+*   This program is distributed in the hope that it will be useful,        *
+*   but WITHOUT ANY WARRANTY; without even the implied warranty of         *
+*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the          *
+*   GNU General Public License for more details.                           *
+*                                                                          *
+*   You should have received a copy of the GNU General Public License      *
+*   along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
+*                                                                          *
+|**************************************************************************|
+*                                                                          *
+*   Author(s)     : Stingor empowered by Claude                            *
+*   Reported by   : Monsii                                                 *
+*   Created Date  : 2026-08-15                                             *
+*   Last Modified : 2026-08-23                                             *
+*                                                                          *
+\**************************************************************************/
+
+/// \brief Restores regular weapon sprites and trails for GM accounts.
+RestoreGMWeaponTrail = function(_)
+{
+	if (Exe.BuildDate !== 20260106)
+		throw Error("RestoreGMWeaponTrail supports only the 2026-01-07 client");
+
+	const head =
+		"E8 ?? ?? ?? ?? 83 C4 04 84 C0";
+	const tail =
+		" FF ?? 10 01 00 00 E8 ?? ?? ?? ??";
+	const shapes = [
+		{
+			name: "weapon trail",
+			count: 10,
+			code: head + " 74 1D" + tail
+				+ " 8B ?? B4 04 00 00 83 C4 04"
+		},
+		{
+			name: "weapon sprite",
+			count: 3,
+			code: head + " 74 50" + tail
+				+ " 8B ?? 60 02 00 00 83 C4 04 84 C0"
+		}
+	];
+
+	$$(_, 1, `Locate the GM weapon branches`);
+	shapes.forEach(shape => {
+		const addrs = Exe.FindHexN(shape.code);
+		if (addrs.length !== shape.count)
+			throw Error(`${shape.name}: found ${addrs.length}, expected ${shape.count}`);
+		addrs.forEach(addr => Exe.SetJMP(addr + 10));
+	});
+
+	return true;
+};
+
+RestoreGMWeaponTrail.validate = function()
+{
+	return Exe.BuildDate === 20260106;
+};

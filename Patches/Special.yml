@@ -22,7 +22,7 @@
 #                                                                          #
 #   Author(s)     : Neo-Mind, Victor Hugo                                  #
 #   Created Date  : 2020-08-26                                             #
-#   Last Modified : 2026-07-17                                             #
+#   Last Modified : 2026-08-23                                             #
 #                                                                          #
 ############################################################################
 
@@ -61,6 +61,12 @@ CustomSpecials:
             recommend : no
             author : 4144
             desc : Remove the limit of max number displayed in atk/damage/heal/etc
+
+        - RestoreSkillAttackAnimation:
+            title : Restore Skill Attack Animation
+            recommend : no
+            author : Stingor
+            desc : Restores the attacker animation for Sonic Blow and Arrow Vulcan. Either or both can be selected.
 
 CustomSkills:
     title : SKILL CUSTOMIZATIONS

@@ -22,7 +22,7 @@
 #                                                                          #
 #   Author(s)     : Neo-Mind                                               #
 #   Created Date  : 2020-08-26                                             #
-#   Last Modified : 2022-09-07                                             #
+#   Last Modified : 2026-08-23                                             #
 #                                                                          #
 ############################################################################
 
@@ -44,6 +44,13 @@ CustomChar:
             recommend : no
             author : Neo-Mind
             desc : Disable GM sprites whilst keeping all the functionality intact like Yellow name and Admin right click menu.
+
+        - RestoreGMWeaponTrail:
+            title : Restore GM weapon trails
+            recommend : no
+            author : Stingor
+            desc : Restores normal weapon trails for accounts listed under &lt;admin&gt; in clientinfo.
+            needs : NoGMSprite
         
         - ShowBGEmblem:
             title : Enable Emblem hover for BG [Experimental]
